@@ -1,0 +1,32 @@
+{
+    "models": {
+        "RedPajama-Chat-3B-v1": {
+            "type": "huggingface",
+            "instantiate_params": {
+                "model": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
+                "tokenizer": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
+                "four_bit": true,
+                "use_cpu": false
+            },
+            "generate_params": {
+                "use_token_type_ids": true
+            }
+        },
+        "Vicuna-13b-1.1-cpp": {
+            "type": "llama.cpp",
+            "instantiate_params": {
+                "url": "https://huggingface.co/vicuna/ggml-vicuna-13b-1.1/resolve/main/ggml-vic13b-q4_0.bin",
+                "n_gpu_layers": 15,
+                "n_ctx": 1024
+            }
+        }
+    },
+    "types": {
+        "huggingface": {
+            "color": "#f3d13b"
+        },
+        "llama.cpp": {
+            "color": "#ab4fe8"
+        }
+    }
+}
