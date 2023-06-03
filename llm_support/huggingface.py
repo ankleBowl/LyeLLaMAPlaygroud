@@ -4,6 +4,8 @@ import torch
 current_model = None
 current_tokenizer = None
 
+model_type = "huggingface"
+
 def load(**kwargs):
     global current_model
     global current_tokenizer

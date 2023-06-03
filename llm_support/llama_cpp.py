@@ -5,6 +5,8 @@ from llama_cpp import Llama
 
 llm = None
 
+model_type = "llama.cpp"
+
 def load(**kwargs):
     global llm
     

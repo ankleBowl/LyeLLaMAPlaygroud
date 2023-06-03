@@ -13,7 +13,7 @@
             }
         },
         "Vicuna-13b-1.1-cpp": {
-            "type": "llama.cpp",
+            "type": "llama_cpp",
             "instantiate_params": {
                 "url": "https://huggingface.co/vicuna/ggml-vicuna-13b-1.1/resolve/main/ggml-vic13b-q4_0.bin",
                 "n_gpu_layers": 15,
@@ -25,7 +25,7 @@
         "huggingface": {
             "color": "#f3d13b"
         },
-        "llama.cpp": {
+        "llama_cpp": {
             "color": "#ab4fe8"
         }
     }

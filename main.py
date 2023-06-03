@@ -3,11 +3,19 @@ from flask_socketio import SocketIO
 import os
 import json
 
-import hf_support
-import llama_cpp_support
-
-
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+if not os.path.exists("models"):
+    os.mkdir("models")
+
+model_types_to_methods = {}
+
+for file in os.listdir("llm_support"):
+    if file.endswith(".py") and not file.startswith("."):
+        print("Loading " + file)
+        exec("import llm_support." + file[:-3] + " as " + file[:-3])
+        model_types_to_methods[file[:-3]] = [eval(file[:-3] + ".load"), eval(file[:-3] + ".generate"), eval(file[:-3] + ".unload"), eval(file[:-3] + ".count_tokens")]
+        print(model_types_to_methods[file[:-3]])
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret_key'
@@ -17,11 +25,6 @@ current_model = {}
 
 temperature = 1.0
 max_length = 64
-
-model_types_to_methods = {
-    "huggingface": [hf_support.load, hf_support.generate, hf_support.unload, hf_support.count_tokens],
-    "llama.cpp": [llama_cpp_support.load, llama_cpp_support.generate, llama_cpp_support.unload, llama_cpp_support.count_tokens]
-}
 
 data = None
 with open("config.json", "r") as f:
