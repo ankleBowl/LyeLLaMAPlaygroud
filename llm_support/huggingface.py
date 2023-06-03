@@ -1,5 +1,6 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, Trainer, TrainingArguments, DataCollatorForLanguageModeling
 import torch
+import os
 
 current_model = None
 current_tokenizer = None
@@ -13,6 +14,8 @@ def load(**kwargs):
     huggingface_id = kwargs.get("model", None)
     tokenizer_id = kwargs.get("tokenizer", None)
     
+    model_folder = "models/" + huggingface_id + "/loras"
+    os.makedirs(model_folder, exist_ok=True)
     
     if tokenizer_id is None:
         tokenizer_id = huggingface_id

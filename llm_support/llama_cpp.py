@@ -15,8 +15,11 @@ def load(**kwargs):
     
     if url is not None:
         file_name = url.split("/")[-1]
-        path = "models/" + file_name
+        path = "models/" + file_name.split(".")[0] + "/" + file_name
+        lora_path = "models/" + file_name.split(".")[0] + "/loras/"
         if not os.path.exists(path):
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            os.makedirs(os.path.dirname(lora_path), exist_ok=True)
             with open(path, "wb") as f:
                 print("Downloading %s" % file_name)
                 response = requests.get(url, stream=True)
