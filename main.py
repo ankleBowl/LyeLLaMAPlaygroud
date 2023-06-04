@@ -19,7 +19,7 @@ for file in os.listdir("llm_support"):
             eval(file[:-3] + ".generate"),
             eval(file[:-3] + ".unload"), 
             eval(file[:-3] + ".count_tokens"), 
-            eval(file[:-3] + ".get_loras")
+            eval(file[:-3] + ".get_loras"),
             eval(file[:-3] + ".load_lora")
         ]
         print(model_types_to_methods[file[:-3]])

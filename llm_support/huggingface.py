@@ -70,5 +70,6 @@ def get_loras():
     return loras
 
 def load_lora(lora_id):
+    global current_model
     lora_path = "models/" + current_model_name + "/loras/" + lora_id
-    model = PeftModel.from_pretrained(model, lora_path)
+    current_model = PeftModel.from_pretrained(current_model, lora_path)
