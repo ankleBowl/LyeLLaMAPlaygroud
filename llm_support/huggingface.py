@@ -1,20 +1,25 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, Trainer, TrainingArguments, DataCollatorForLanguageModeling
+from peft import LoraConfig, get_peft_model, PeftModel 
 import torch
 import os
 
 current_model = None
 current_tokenizer = None
+current_model_name = None
 
 model_type = "huggingface"
 
 def load(**kwargs):
     global current_model
     global current_tokenizer
+    global current_model_name
     
     huggingface_id = kwargs.get("model", None)
     tokenizer_id = kwargs.get("tokenizer", None)
     
-    model_folder = "models/" + huggingface_id + "/loras"
+    current_model_name = huggingface_id.replace("/", "_")
+    
+    model_folder = "models/" + current_model_name + "/loras"
     os.makedirs(model_folder, exist_ok=True)
     
     if tokenizer_id is None:
@@ -55,3 +60,15 @@ def unload():
 def count_tokens(prompt):
     inputs = current_tokenizer(prompt, return_tensors="pt")
     return inputs["input_ids"].shape[1]
+
+def get_loras():
+    lora_path = "models/" + current_model_name + "/loras"
+    loras = []
+    for file in os.listdir(lora_path):
+        if os.path.isdir(os.path.join(lora_path, file)):
+            loras.append(file)
+    return loras
+
+def load_lora(lora_id):
+    lora_path = "models/" + current_model_name + "/loras/" + lora_id
+    model = PeftModel.from_pretrained(model, lora_path)

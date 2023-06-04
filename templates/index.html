@@ -124,7 +124,7 @@
             box-sizing: border-box;
         }
 
-        #modelSelector {
+        .modelSelector {
             display: flex; align-items: center; padding: 10px; box-sizing: border-box;
             border-radius: 5px;
             border: 1px solid black;
@@ -147,7 +147,7 @@
             transition: all 0.2s;
         }
 
-        #modelList {
+        .modelList {
             background-color: white;
             border-radius: 5px;
             box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
@@ -214,9 +214,15 @@
     </div>
 
     <div class="popupContainer" id="modelListContainer" style="opacity: 0; pointer-events: none;">
-        <div id="modelList">
+        <div id="modelList" class="modelList">
             <h1>Select a model</h1>
             $models
+        </div>
+    </div>
+
+    <div class="popupContainer" id="loraListContainer" style="opacity: 0; pointer-events: none;">
+        <div class="modelList">
+            
         </div>
     </div>
 
@@ -236,7 +242,8 @@
             </div>
         </div>
         <div id="sidebar">
-            <div id="modelSelector" onclick="showElem(document.getElementById('modelListContainer'))">Select</div>
+            <div class="modelSelector" id="modelSelector" onclick="showElem(document.getElementById('modelListContainer'))">Model</div>
+            <div style="margin-top: 10px" class="modelSelector" id="loraSelector" onclick="showLoraList()">LoRAs</div>
             <div class="sliderContainer" id="tempSlider" var_name="temperature" max="2" min="0" floor="false">
                 <div>
                     <div>Temperature</div>
@@ -258,7 +265,6 @@
 <script>
     var socket = io();
     socket.on('message', function(message) {
-        console.log(message);
         parts = message.split(":", 2);
         if (parts[0] == "block_screen") {
             popup(parts[1], dismissable=false)
@@ -277,6 +283,16 @@
             document.getElementById("generateButton").classList.remove("generating");
         } else if (parts[0] == "token_count") {
             document.getElementById("tokenCount").innerHTML = parts[1] + " tokens";
+        } else if (parts[0] == "loras") {
+            html = "<h1>Loras</h1>"
+            loras = parts[1].split(";");
+            console.log(loras);
+            for (i = 0; i < loras.length; i++) {
+                html += "<div class='model' onclick='loadLora(\"" + loras[i] + "\")'>" + loras[i] + "</div>";
+            } 
+            html += "<button style='margin-top: 15px;' onclick='hideElem(document.getElementById(\"loraListContainer\"))'><div>Close</div></button>"
+            document.getElementById("loraListContainer").children[0].innerHTML = html;
+            showElem(document.getElementById("loraListContainer")); 
         }
     });
     socket.on('disconnect', function() {
@@ -288,6 +304,7 @@
 
     var modelResponse = document.getElementById("modelResponse");
     var modelListContainer = document.getElementById("modelListContainer");
+    var loraListContainer = document.getElementById("loraListContainer");
     var canChangeModel = true;
     var generating = false;
     
@@ -300,6 +317,11 @@
         socket.emit("message", "count_tokens:" + this.value);
     });
 
+    function loadLora(lora_id) {
+        hideElem(loraListContainer);
+        socket.emit("message", "load_lora:" + lora_id);
+    }
+
     function loadModel(model_id) {
         if (!canChangeModel) {
             return;
@@ -307,6 +329,10 @@
         hideElem(modelListContainer);
         document.getElementById("modelSelector").innerHTML = model_id;
         socket.emit("message", "load_model:" + model_id);
+    }
+
+    function showLoraList() {
+        socket.emit("message", "get_loras");
     }
 
     function complete() {

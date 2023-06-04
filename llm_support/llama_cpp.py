@@ -42,6 +42,8 @@ def load(**kwargs):
         
     llm = Llama(model_path=path, n_gpu_layers=n_gpu_layers, n_ctx=n_ctx)
     
+    
+    
 def generate(prompt, max_length, temperature, **kwargs):
     global llm
     print(prompt)
@@ -56,3 +58,9 @@ def unload():
 
 def count_tokens(prompt):
     return len(llm.tokenize(prompt))
+
+def get_loras():
+    return []
+
+def load_lora(lora_id):
+    pass

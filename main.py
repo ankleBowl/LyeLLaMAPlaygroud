@@ -14,7 +14,14 @@ for file in os.listdir("llm_support"):
     if file.endswith(".py") and not file.startswith("."):
         print("Loading " + file)
         exec("import llm_support." + file[:-3] + " as " + file[:-3])
-        model_types_to_methods[file[:-3]] = [eval(file[:-3] + ".load"), eval(file[:-3] + ".generate"), eval(file[:-3] + ".unload"), eval(file[:-3] + ".count_tokens")]
+        model_types_to_methods[file[:-3]] = [
+            eval(file[:-3] + ".load"), 
+            eval(file[:-3] + ".generate"),
+            eval(file[:-3] + ".unload"), 
+            eval(file[:-3] + ".count_tokens"), 
+            eval(file[:-3] + ".get_loras")
+            eval(file[:-3] + ".load_lora")
+        ]
         print(model_types_to_methods[file[:-3]])
 
 app = Flask(__name__)
@@ -112,6 +119,23 @@ def handle_message(message):
         if var_name == "max_length":
             max_length = int(var_value)
             print("Max length set to " + str(max_length))
-
+    if msg_type == "get_loras":
+        loras = model_types_to_methods[current_model["type"]][4]()
+        loras.append("None")
+        string_rep = ""
+        for lora in loras:
+            string_rep += lora + ";"
+        string_rep = string_rep[:-1]
+        socketio.emit('message', "loras:" + string_rep)
+    if msg_type == "load_lora":
+        socketio.emit('message', "block_screen:Loading LoRA...")
+        print("Loading lora")
+        lora = message.split(":", 1)[1]
+        if lora == "None":
+            model_types_to_methods[current_model["type"]][2]()
+            model_types_to_methods[current_model["type"]][0](**current_model["instantiate_params"])
+        else:
+            model_types_to_methods[current_model["type"]][5](lora)
+        socketio.emit('message', "unblock_screen")
 if __name__ == '__main__':
     socketio.run(app, port=7001)
